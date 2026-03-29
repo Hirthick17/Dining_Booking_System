@@ -5,10 +5,11 @@
     "main": "server.js",
     "type": "module",
     "scripts": {
-        "start": "node server.js",
+        "start": "node src/server.js",
         "dev": "nodemon server.js",
         "seed": "node seed.js",
-        "test-redis": "node test-redis.js"
+        "test-redis": "node test-redis.js",
+        "build": "echo 'No build needed'"
     },
     "keywords": [
         "restaurant",
@@ -28,9 +29,13 @@
         "express-validator": "^7.0.1",
         "ioredis": "^5.9.3",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.0.3"
+        "mongoose": "^8.0.3",
+        "railway": "^2.0.17"
     },
     "devDependencies": {
         "nodemon": "^3.0.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
     }
 }
