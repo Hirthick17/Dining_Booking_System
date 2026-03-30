@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    match: [/^\+?[1-9]\d{1,14}$/, 'Please provide a valid phone number in E.164 format']
+    match: [/^[+]?[0-9]{7,15}$/, 'Please provide a valid phone number']
   },
   password: {
     type: String,
