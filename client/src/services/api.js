@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Dynamically pull the URL from Vercel, with a local fallback for development
-const baseURL = process.env.REACT_APP_API_URL || 'https://dining-booking-system.vercel.app/api';
+const baseURL = process.env.REACT_APP_API_URL || 'https://dining-booking-system.onrender.com/api';
 
 const api = axios.create({
   baseURL: baseURL,

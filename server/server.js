@@ -16,13 +16,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-// Removed strict allowedOrigins since we now dynamically accept origins in the cors configuration.
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  // Vercel production and preview deployments
+  'https://diningbooking.vercel.app',
+  'https://diningbooking-git-main-hirthicks-projects-a7b6dc59.vercel.app',
+];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow any origin by passing the request's origin dynamically
-    callback(null, origin || true);
+    // Allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    // Allow any *.vercel.app preview deploy automatically
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    console.warn(`[CORS] Blocked request from: ${origin}`);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
