@@ -17,28 +17,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'https://dining-booking-system.vercel.app'
-];
-
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
+// Removed strict allowedOrigins since we now dynamically accept origins in the cors configuration.
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Check if origin matches allowed origins or is a vercel sub-domain
-    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      callback(null, true);
-    } else {
-      console.warn(`Blocked by CORS: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Allow any origin by passing the request's origin dynamically
+    callback(null, origin || true);
   },
   credentials: true
 }));
