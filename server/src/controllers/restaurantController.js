@@ -27,15 +27,17 @@ export const getRestaurants = async (req, res, next) => {
     const restaurants = await Restaurant.find(query)
       .select('name slug location cuisineTypes priceRange averageCostForTwo images rating operatingHours isFeatured')
       .sort({ 'rating.average': -1 })
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: restaurants.length,
       restaurants
     });
   } catch (error) {
-    next(error);
+    console.error('getRestaurants error:', error.message);
+    return next(error);
   }
 };
 
@@ -44,7 +46,7 @@ export const getRestaurants = async (req, res, next) => {
 // @access  Public
 export const getRestaurant = async (req, res, next) => {
   try {
-    const restaurant = await Restaurant.findById(req.params.id);
+    const restaurant = await Restaurant.findById(req.params.id).lean();
 
     if (!restaurant) {
       return res.status(404).json({
@@ -53,12 +55,13 @@ export const getRestaurant = async (req, res, next) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       restaurant
     });
   } catch (error) {
-    next(error);
+    console.error('getRestaurant error:', error.message);
+    return next(error);
   }
 };
 
@@ -66,12 +69,13 @@ export const getCities = async (req, res, next) => {
   try {
     const cities = await Restaurant.distinct('location.city', { isActive: true });
     
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       cities: cities.sort()
     });
   } catch (error) {
-    next(error);
+    console.error('getCities error:', error.message);
+    return next(error);
   }
 };
 
@@ -79,12 +83,13 @@ export const getCuisines = async (req, res, next) => {
   try {
     const cuisines = await Restaurant.distinct('cuisineTypes', { isActive: true });
     
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       cuisines: cuisines.sort()
     });
   } catch (error) {
-    next(error);
+    console.error('getCuisines error:', error.message);
+    return next(error);
   }
 };
 
@@ -94,7 +99,8 @@ export const getCuisines = async (req, res, next) => {
 export const getAvailability = async (req, res, next) => {
   try {
     const restaurant = await Restaurant.findById(req.params.id)
-      .select('currentAvailability seatingCapacity bookingSettings');
+      .select('currentAvailability seatingCapacity bookingSettings')
+      .lean();
 
     if (!restaurant) {
       return res.status(404).json({
@@ -123,12 +129,13 @@ export const getAvailability = async (req, res, next) => {
     res.setHeader('ETag', etag);
     res.setHeader('Cache-Control', 'no-cache'); // Must revalidate
     
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       availability
     });
   } catch (error) {
-    next(error);
+    console.error('getAvailability error:', error.message);
+    return next(error);
   }
 };
 
@@ -143,15 +150,17 @@ export const getFeaturedRestaurants = async (req, res, next) => {
     })
       .select('-__v')
       .sort({ 'rating.average': -1 })
-      .limit(6);
+      .limit(6)
+      .lean();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: restaurants.length,
       restaurants
     });
   } catch (error) {
-    next(error);
+    console.error('getFeaturedRestaurants error:', error.message);
+    return next(error);
   }
 };
 
@@ -164,15 +173,16 @@ export const getTrendingRestaurants = async (req, res, next) => {
     const restaurants = await Restaurant.find({ isActive: true })
       .select('-__v')
       .sort({ totalBookings: -1, 'rating.average': -1, views: -1 })
-      .limit(6);
+      .limit(6)
+      .lean();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: restaurants.length,
       restaurants
     });
   } catch (error) {
-    next(error);
+    console.error('getTrendingRestaurants error:', error.message);
+    return next(error);
   }
 };
-

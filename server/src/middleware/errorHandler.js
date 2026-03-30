@@ -1,43 +1,19 @@
 export const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
-
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const errors = Object.values(err.errors).map(e => e.message);
-    return res.status(400).json({
-      success: false,
-      message: 'Validation Error',
-      errors
-    });
-  }
-
-  // Mongoose duplicate key error
-  if (err.code === 11000) {
-    const field = Object.keys(err.keyPattern)[0];
-    return res.status(400).json({
-      success: false,
-      message: `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`
-    });
-  }
-
-  // JWT errors
-  if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid token'
-    });
-  }
-
-  if (err.name === 'TokenExpiredError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Token expired'
-    });
-  }
-
-  // Default error
-  res.status(err.statusCode || 500).json({
+  const statusCode = err.statusCode || err.status || 500;
+  
+  // Always log full details to Render logs
+  console.error('═══════════════════════════');
+  console.error(`[${new Date().toISOString()}] ERROR`);
+  console.error(`Route: ${req.method} ${req.originalUrl}`);
+  console.error(`Message: ${err.message}`);
+  console.error(`Stack: ${err.stack}`);
+  console.error('═══════════════════════════');
+  
+  res.status(statusCode).json({
     success: false,
-    message: err.message || 'Server Error'
+    message: err.message || 'Internal server error',
+    ...(process.env.NODE_ENV === 'development' && { 
+      stack: err.stack 
+    })
   });
 };

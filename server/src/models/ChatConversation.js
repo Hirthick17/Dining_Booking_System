@@ -119,7 +119,7 @@ const aiConversationSchema = new mongoose.Schema({
 });
 
 // Indexes
-aiConversationSchema.index({ sessionId: 1 });
+// Removed duplicate sessionId index
 aiConversationSchema.index({ user: 1, createdAt: -1 });
 aiConversationSchema.index({ isActive: 1 });
 

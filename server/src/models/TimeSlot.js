@@ -16,8 +16,7 @@ const timeSlotSchema = new mongoose.Schema({
   // Date and time
   date: {
     type: Date,
-    required: true,
-    index: true
+    required: true
   },
   timeSlot: {
     type: String,

@@ -373,7 +373,7 @@ const restaurantSchema = new mongoose.Schema({
 
 // Indexes
 restaurantSchema.index({ 'location.coordinates': '2dsphere' });
-restaurantSchema.index({ slug: 1 });
+// Removed duplicate slug index
 restaurantSchema.index({ name: 'text', description: 'text' });
 restaurantSchema.index({ cuisineTypes: 1 });
 restaurantSchema.index({ priceRange: 1 });

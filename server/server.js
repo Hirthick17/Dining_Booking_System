@@ -51,6 +51,33 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/api/debug', async (req, res) => {
+  try {
+    const { default: Restaurant } = await import('./src/models/Restaurant.js');
+
+    const dbState = mongoose.connection.readyState;
+    // 0=disconnected, 1=connected, 2=connecting, 3=disconnecting
+
+    const count = await Restaurant.countDocuments();
+    const sample = await Restaurant.findOne().lean();
+
+    res.json({
+      dbState,
+      restaurantCount: count,
+      sampleDoc: sample,
+      env: {
+        hasMongoUri: !!process.env.MONGODB_URI,
+        hasJwtSecret: !!process.env.JWT_SECRET,
+        hasGeminiKey: !!process.env.GEMINI_API_KEY,
+        nodeEnv: process.env.NODE_ENV,
+        frontendUrl: process.env.FRONTEND_URL
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/bookings', bookingRoutes);
@@ -61,8 +88,10 @@ app.use('/api/ai', aiChatRoutes);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
+}
 
 export default app;
