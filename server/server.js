@@ -17,12 +17,29 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://dining-booking-system.vercel.app'
+];
+
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',       // local dev
-    'http://localhost:5173',       // Vite local dev
-    process.env.FRONTEND_URL       // production frontend URL
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin matches allowed origins or is a vercel sub-domain
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      console.warn(`Blocked by CORS: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
@@ -44,6 +61,8 @@ app.get('/', (req, res) => {
       bookings: '/api/bookings',
       reviews: '/api/reviews',
       ai: '/api/ai'
+
+      
     }
   });
 });
