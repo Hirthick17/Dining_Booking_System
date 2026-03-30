@@ -42,7 +42,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ MongoDB connected successfully'))
+  .then(() => {
+    const dbName = mongoose.connection.db.databaseName;
+    const maskedUri = (process.env.MONGODB_URI || '').replace(/:([^@]+)@/, ':****@');
+    console.log(`✅ MongoDB connected successfully`);
+    console.log(`📦 Database name: ${dbName}`);
+    console.log(`🔗 URI (masked): ${maskedUri}`);
+  })
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // Routes
@@ -74,6 +80,8 @@ app.get('/api/debug', async (req, res) => {
 
     res.json({
       dbState,
+      dbName: mongoose.connection.db?.databaseName,
+      maskedUri: (process.env.MONGODB_URI || '').replace(/:([^@]+)@/, ':****@'),
       restaurantCount: count,
       sampleDoc: sample,
       env: {
